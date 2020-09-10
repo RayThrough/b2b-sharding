@@ -7,6 +7,7 @@ import com.nala.sharding.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
@@ -27,8 +28,8 @@ public class UserController {
     private UserMapper userMapper;
 
     @RequestMapping("/test")
-    public void test(){
-        User user = new User("测试22", 1);
+    public void test(@RequestParam String name, @RequestParam Integer type){
+        User user = new User(name, type);
         userMapper.insert(user);
     }
 }

@@ -2,8 +2,6 @@ package com.nala.sharding.Enum;
 
 import lombok.Getter;
 
-import java.util.UUID;
-
 @Getter
 public enum IdGeneratorTypeEnum {
 
