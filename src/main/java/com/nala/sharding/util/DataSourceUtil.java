@@ -18,7 +18,7 @@ public class DataSourceUtil {
     public static DataSource createDataSource(final String dataSourceName) {
         DruidDataSource druidDataSource = new DruidDataSource();
         druidDataSource.setDriverClassName(com.mysql.cj.jdbc.Driver.class.getName());
-        druidDataSource.setUrl("jdbc:mysql://"+ HOST +":"+ PORT +"/"+ dataSourceName +"?useAffectedRows=true&userUnicode=true&characterEncoding=utf8&pinGlobalTxToPhysicalConnection=true&serverTimezone=GMT%2b8");
+        druidDataSource.setUrl("jdbc:mysql://"+ HOST +":"+ PORT +"/"+ dataSourceName +"?useAffectedRows=true&userUnicode=true&characterEncoding=utf8&p inGlobalTxToPhysicalConnection=true&serverTimezone=GMT%2b8");
         druidDataSource.setUsername(USER_NAME);
         druidDataSource.setPassword(PASS_WORD);
         return druidDataSource;

@@ -39,6 +39,8 @@
         <equator.version>1.0.2</equator.version>
         <jackson.version>2.9.10</jackson.version>
         <joda-time.version>2.10.1</joda-time.version>
+        <canal.version>1.0.24</canal.version>
+        <nala-tool.version>1.0.2-SNAPSHOT</nala-tool.version>
     </properties>
 
     <dependencies>
@@ -154,6 +156,37 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- cananl -->
+        <dependency>
+            <groupId>com.alibaba.otter</groupId>
+            <artifactId>canal.client</artifactId>
+            <version>${canal.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-core</artifactId>
+                </exclusion>
+
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
+                </exclusion>
+
+            </exclusions>
+        </dependency>
+
+        <!--工具系列-->
+        <dependency>
+            <groupId>com.nala.tools</groupId>
+            <artifactId>kits</artifactId>
+            <version>${nala-tool.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
