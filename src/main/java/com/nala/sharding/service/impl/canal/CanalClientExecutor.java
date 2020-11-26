@@ -6,12 +6,14 @@ import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.alibaba.otter.canal.protocol.Message;
 import com.alibaba.otter.canal.protocol.exception.CanalClientException;
 import com.google.common.base.Joiner;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.nala.sharding.config.canal.CanalConfig;
 import com.nala.sharding.config.canal.TableData;
 import com.nala.tools.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -19,14 +21,14 @@ import org.springframework.stereotype.Component;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
  * canal客户端程
  */
 @Slf4j
-//@Component
+@Component
 public class CanalClientExecutor implements DisposableBean, ApplicationListener<ContextRefreshedEvent> {
 
 
@@ -47,6 +49,14 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
      *  需要监听过滤的一些表
      */
     private static List<String> tableNames;
+
+    /**
+     * 线程池统一接收，处理请求的
+     */
+    @Autowired
+    @Qualifier("getAsyncExecutor")
+    private Executor executor;
+
 
     /***
      * 初始化
@@ -72,8 +82,7 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
         log.info(">>> Canal启动......");
         init();
         // 执行启动
-        this.start();
-
+        executor.execute(this::start);
     }
 
     /***
