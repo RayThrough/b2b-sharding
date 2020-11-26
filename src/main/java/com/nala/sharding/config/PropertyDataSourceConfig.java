@@ -52,8 +52,8 @@ public class PropertyDataSourceConfig {
         shardingRuleConfig.getTableRuleConfigs().add(getOrderRuleTableConfiguration());
         shardingRuleConfig.setBindingTableGroups(Collections.singletonList("user"));
         Map<String, DataSource> dataSourceMap = new HashMap<>();
-        dataSourceMap.put("b2b_0", dataSource0Config.createDataSource());
-        dataSourceMap.put("b2b_1", dataSource1Config.createDataSource());
+        dataSourceMap.put("sharding_0", dataSource0Config.createDataSource());
+        dataSourceMap.put("sharding_1", dataSource1Config.createDataSource());
         Properties properties = new Properties();
         properties.setProperty("sql.show", Boolean.TRUE.toString());
         return ShardingDataSourceFactory.createDataSource(dataSourceMap, shardingRuleConfig, properties);
@@ -64,7 +64,7 @@ public class PropertyDataSourceConfig {
      * @return 返回配置信息
      */
     private TableRuleConfiguration getOrderRuleTableConfiguration(){
-        TableRuleConfiguration configuration = new TableRuleConfiguration("user", "b2b_${0..1}.user_${0..3}");
+        TableRuleConfiguration configuration = new TableRuleConfiguration("user", "sharding_${0..1}.user_${0..3}");
         configuration.setDatabaseShardingStrategyConfig(new StandardShardingStrategyConfiguration("id", new PreciseModuloShardingDataBaseAlgorithm()));
         configuration.setTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("type", new PreciseModuloShardingTableAlgorithm()));
         configuration.setKeyGeneratorConfig(getKeyGeneratorConfiguration());

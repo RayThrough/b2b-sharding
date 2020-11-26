@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * canal客户端程
  */
 @Slf4j
-@Component
+//@Component
 public class CanalClientExecutor implements DisposableBean, ApplicationListener<ContextRefreshedEvent> {
 
 

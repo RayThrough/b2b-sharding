@@ -15,8 +15,8 @@ import javax.sql.DataSource;
  * @Description:
  */
 @Data
-@Component(value = "b2b_0")
-@ConfigurationProperties(prefix = "spring.shardingsphere.datasource.b2b0")
+@Component(value = "sharding_0")
+@ConfigurationProperties(prefix = "spring.shardingsphere.datasource.sharding0")
 public class DataSource0Config {
 
     private String url;
@@ -27,7 +27,7 @@ public class DataSource0Config {
 
     private String type;
 
-    @Value("${spring.shardingsphere.datasource.b2b0.driver-class-name}")
+    @Value("${spring.shardingsphere.datasource.sharding0.driver-class-name}")
     private String driverClassName;
 
     public DataSource createDataSource(){
