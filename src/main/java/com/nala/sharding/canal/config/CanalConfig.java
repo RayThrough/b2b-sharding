@@ -1,4 +1,4 @@
-package com.nala.sharding.config.canal;
+package com.nala.sharding.canal.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

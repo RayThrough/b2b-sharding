@@ -1,4 +1,4 @@
-package com.nala.sharding.service.impl.canal;
+package com.nala.sharding.canal;
 
 import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
@@ -6,9 +6,8 @@ import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.alibaba.otter.canal.protocol.Message;
 import com.alibaba.otter.canal.protocol.exception.CanalClientException;
 import com.google.common.base.Joiner;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.nala.sharding.config.canal.CanalConfig;
-import com.nala.sharding.config.canal.TableData;
+import com.nala.sharding.canal.config.CanalConfig;
+import com.nala.sharding.canal.config.TableData;
 import com.nala.tools.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -121,7 +120,6 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
         try {
             //连接；并监听需要监听的数据库
             connector.connect();
-//            connector.subscribe(canalConfig.getListenerDb() + "\\..*");
             // 订阅指定数据表，由canal进行过滤
             connector.subscribe(Joiner.on(",").join(tableNames));
             start = true;
@@ -159,7 +157,6 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
                     }
                 } else {
                     // 数据处理
-//                    log.info("获取信息：【{}】", msg.getEntries());
                     processData(msg.getEntries());
                 }
                 connector.ack(batchId);

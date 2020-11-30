@@ -1,4 +1,4 @@
-package com.nala.sharding.config.canal;
+package com.nala.sharding.canal.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
