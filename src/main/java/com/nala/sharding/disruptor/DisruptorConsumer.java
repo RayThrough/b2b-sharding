@@ -1,20 +1,11 @@
 package com.nala.sharding.disruptor;
 
 import com.lmax.disruptor.EventHandler;
-import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.WorkHandler;
-import com.lmax.disruptor.YieldingWaitStrategy;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
 import com.nala.sharding.service.IDisruptorService;
-import com.nala.sharding.service.IStrategyService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
 
 /**
  * disruptor消费者
