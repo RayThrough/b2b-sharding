@@ -39,11 +39,8 @@ public class DisruptorConsumer implements EventHandler<LongEvent>, WorkHandler<L
 
     @Override
     public void onEvent(LongEvent longEvent, long sequence, boolean endOfBatch) throws Exception {
-        if (log.isDebugEnabled())
-        {
-            log.info("接受到数据更新请求  >>>{}", longEvent);
-            log.info("Sequence:{}", sequence);
-            log.info("End Of Batch：{}", endOfBatch);
+        if (log.isDebugEnabled()) {
+            log.info("接受到数据更新请求 >>>{}，Sequence:{}，End Of Batch：{}", longEvent, sequence, endOfBatch);
         }
         this.onEvent(longEvent);
     }

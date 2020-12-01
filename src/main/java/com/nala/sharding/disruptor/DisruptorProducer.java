@@ -1,11 +1,14 @@
 package com.nala.sharding.disruptor;
 
+import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
+import com.nala.sharding.canal.config.TableData;
 import com.nala.sharding.service.IDisruptorService;
 import com.nala.sharding.service.IStrategyService;
+import com.nala.tools.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -108,6 +112,29 @@ public class DisruptorProducer implements DisposableBean, ApplicationListener<Co
         disruptor.setDefaultExceptionHandler(new LongEventExceptionHandler());
         ringBuffer = disruptor.start();
         this.isStart = true;
+    }
+
+    /**
+     * 外部方法，用于调用disruptor来发布时间
+     * @param tableData 数据组装
+     */
+    public void send(List<TableData> tableData){
+        if (CollectionUtil.isNotEmpty(tableData)){
+            executorService.execute(() -> {
+                tableData.forEach(t -> {
+                    //第一种写法
+//                    EventTranslatorOneArg<LongEvent, TableData> translator = new EventTranslatorOneArg<LongEvent, TableData>() {
+//                        @Override
+//                        public void translateTo(LongEvent longEvent, long sequence, TableData tableData) {
+//                            longEvent.setTableData(tableData);
+//                        }
+//                    };
+                    //第二种写法lambda
+                    EventTranslatorOneArg<LongEvent, TableData> translator = (longEvent, sequence, data) -> longEvent.setTableData(t);
+                    ringBuffer.publishEvent(translator, t);
+                });
+            });
+        }
     }
 
     @Override

@@ -29,7 +29,7 @@
 //        }
 //    }
 //
-//    public static Translator TRANSLATOR = new Translator();
+//    public static Transla·tor TRANSLATOR = new Translator();
 //
 //    public static void publishEvent2(Disruptor<LongEvent> disruptor) {
 //        // 发布事件；
