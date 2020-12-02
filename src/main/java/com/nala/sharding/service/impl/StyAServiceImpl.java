@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  * @author liansr@nala.com.cn
  * @since 2020-09-08
  */
-@Component(value = "A")
+@Component(value = "user_0")
 @Slf4j
 public class StyAServiceImpl implements IStrategyService {
 

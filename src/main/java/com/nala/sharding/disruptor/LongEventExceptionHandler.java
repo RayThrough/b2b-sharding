@@ -1,7 +1,9 @@
 package com.nala.sharding.disruptor;
 
 import com.lmax.disruptor.ExceptionHandler;
+import com.nala.sharding.service.IDisruptorService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 定义disruptor异常处理类
@@ -10,12 +12,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LongEventExceptionHandler implements ExceptionHandler<LongEvent> {
 
+    private final IDisruptorService disruptorService;
 
+    public LongEventExceptionHandler(IDisruptorService disruptorService) {
+        this.disruptorService = disruptorService;
+    }
 
     @Override
-    public void handleEventException(Throwable throwable, long l, LongEvent longEvent) {
-        //todo 事件调用逻辑处理异常
-
+    public void handleEventException(Throwable throwable, long sequence, LongEvent longEvent) {
+        //事件调用逻辑处理异常
+        disruptorService.handle(longEvent.getTableData());
+        log.error(">>> Disruptor事件处理异常，进行立即执行补偿操作 >>>");
+        log.error("Disruptor 异常信息如下：{}", throwable.getMessage());
     }
 
     @Override

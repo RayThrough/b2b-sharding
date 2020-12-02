@@ -26,7 +26,7 @@ public class DisruptorServiceImpl implements IDisruptorService {
     @Override
     public void handle(TableData tableData) {
         if (tableData != null) {
-            strategyManager.handle(tableData.getDbName());
+            strategyManager.handle(tableData.getTableName());
         }
     }
 }

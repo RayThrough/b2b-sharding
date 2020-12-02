@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @author liansr@nala.com.cn
  * @since 2020-09-08
  */
-@Component(value = "D")
+@Component(value = "user_3")
 @Slf4j
 public class StyDServiceImpl implements IStrategyService {
 

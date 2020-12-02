@@ -8,6 +8,7 @@ import com.alibaba.otter.canal.protocol.exception.CanalClientException;
 import com.google.common.base.Joiner;
 import com.nala.sharding.canal.config.CanalConfig;
 import com.nala.sharding.canal.config.TableData;
+import com.nala.sharding.disruptor.DisruptorProducer;
 import com.nala.tools.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -56,6 +58,11 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
     @Qualifier("getAsyncExecutor")
     private Executor executor;
 
+    /**
+     * disruptor生产者，用于发布事件
+     */
+    @Autowired
+    private DisruptorProducer disruptorProducer;
 
     /***
      * 初始化
@@ -214,7 +221,8 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
                         case UPDATE:
                             //todo 业务处理逻辑
 //                            checkShouldContinueLogic(rowData, dbName, tableName, tableDataList);
-                            log.info("rowData:{},dbName:{},tableName:{},tableDataList:{}", rowData, dbName, tableName, tableDataList);
+//                            log.info("rowData:{},dbName:{},tableName:{},tableDataList:{}", rowData, dbName, tableName, tableDataList);
+                            tableDataList.add(new TableData().setTableName(tableName));
                             break;
                         case DELETE:
                             break;
@@ -227,10 +235,10 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
             }
         }
         if (CollectionUtil.isNotEmpty(tableDataList)) {
-            List<TableData> tableDataDistinctList = tableDataList.stream().distinct().collect(Collectors.toList());
-            log.info("平台disruptor数据：【{}】", tableDataDistinctList);
+//            List<TableData> tableDataDistinctList = tableDataList.stream().distinct().collect(Collectors.toList());
+//            log.info("平台disruptor数据：【{}】", tableDataDistinctList);
             //发送数据到异步队列框架
-//            disruptorProducer.send(tableDataDistinctList);
+            disruptorProducer.send(tableDataList);
         }
         if (log.isDebugEnabled()) {
             log.debug("接收到Mysql更新数据，总数量：{}", tableDataList.size());

@@ -38,8 +38,6 @@ public class DisruptorConsumer implements EventHandler<LongEvent>, WorkHandler<L
 
     @Override
     public void onEvent(LongEvent longEvent) throws Exception {
-        executor.execute(() -> {
-            disruptorService.handle(longEvent.getTableData());
-        });
+        executor.execute(() -> disruptorService.handle(longEvent.getTableData()));
     }
 }
