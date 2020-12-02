@@ -3,7 +3,6 @@ package com.nala.sharding.disruptor;
 import com.lmax.disruptor.ExceptionHandler;
 import com.nala.sharding.service.IDisruptorService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 定义disruptor异常处理类
