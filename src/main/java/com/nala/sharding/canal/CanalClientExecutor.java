@@ -9,21 +9,22 @@ import com.google.common.base.Joiner;
 import com.nala.sharding.canal.config.CanalConfig;
 import com.nala.sharding.canal.config.TableData;
 import com.nala.sharding.disruptor.DisruptorProducer;
+import com.nala.sharding.disruptor.DisruptorThreadFactory;
 import com.nala.tools.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * canal客户端程
@@ -54,9 +55,12 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
     /**
      * 线程池统一接收，处理请求的
      */
-    @Autowired
-    @Qualifier("getAsyncExecutor")
-    private Executor executor;
+    private ExecutorService executor;
+
+    /**
+     * 定时检测canal重连机制的线程池
+     */
+    private ScheduledExecutorService scheduledExecutor;
 
     /**
      * disruptor生产者，用于发布事件
@@ -69,11 +73,19 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
      */
     private void init() {
         log.info(">>> 初始化Canal连接信息.......");
+        //获取可用线程连接
+        int availableThreads = Runtime.getRuntime().availableProcessors();
 
         //创建连接
         log.info(">>> 建立单Canal连接信息：{}", canalConfig.getHost());
         connector = CanalConnectors.newSingleConnector(new InetSocketAddress(canalConfig.getHost(), canalConfig.getPort()),
                 canalConfig.getDestination(), canalConfig.getUserName(), canalConfig.getPassword());
+
+        //初始化Canal线程，标记为守护线程
+        executor = Executors.newSingleThreadExecutor(DisruptorThreadFactory.create("Canal servers-", true));
+
+        //创建一个定时检测canal连接状况的线程，进行失败重连机制
+        scheduledExecutor = Executors.newScheduledThreadPool(availableThreads, DisruptorThreadFactory.create("Canal Scheduled Check servers-", true));
 
         tableNames = canalConfig.getListenerTables();
     }
@@ -89,21 +101,9 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
         init();
         // 执行启动
         executor.execute(this::start);
-    }
 
-    /***
-     * bean卸载时调用
-     */
-    @Override
-    public void destroy() {
-        log.error(">>> 即将关闭Canal连接，销毁线程池.....");
-        if (start) {
-            try {
-                connector.disconnect();
-            } catch (CanalClientException e) {
-                log.error(">>> 关闭Canal连接异常：", e);
-            }
-        }
+        //检测是否失败，启动1分钟后检测，每两分钟执行一次，失败进行重新连接
+        scheduledExecutor.scheduleAtFixedRate(this::check, 1, 2, TimeUnit.MINUTES);
     }
 
 
@@ -131,7 +131,7 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
             connector.subscribe(Joiner.on(",").join(tableNames));
             start = true;
             log.info(">>> Canal连接成功，订阅DB：【{}】，table：【{}】", canalConfig.getListenerDb(), tableNames);
-        } catch (CanalClientException e) {
+        } catch (Exception e) {
             log.error(">>> Canal服务连接失败：", e);
             start = false;
         }
@@ -470,4 +470,19 @@ public class CanalClientExecutor implements DisposableBean, ApplicationListener<
 //        map.setHandler(CanalDisruptorHandlerEnum.ORDER_ES_SAVE_UPDATE.name());
 //        tableDataList.add(map);
 //    }
+
+    /***
+     * bean卸载时调用
+     */
+    @Override
+    public void destroy() {
+        log.error(">>> 即将关闭Canal连接，销毁线程池.....");
+        if (start) {
+            try {
+                connector.disconnect();
+            } catch (CanalClientException e) {
+                log.error(">>> 关闭Canal连接异常：", e);
+            }
+        }
+    }
 }

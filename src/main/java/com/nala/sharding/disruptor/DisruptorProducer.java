@@ -107,7 +107,7 @@ public class DisruptorProducer implements DisposableBean, ApplicationListener<Co
 
         //定义异常处理
         disruptor.handleEventsWithWorkerPool(disruptorConsumers);
-        disruptor.setDefaultExceptionHandler(new LongEventExceptionHandler());
+        disruptor.setDefaultExceptionHandler(new LongEventExceptionHandler(disruptorService));
         ringBuffer = disruptor.start();
         this.isStart = true;
     }
